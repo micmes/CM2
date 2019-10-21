@@ -1,28 +1,36 @@
 import unittest
+import sys 
+sys.path.append('/home/michele/Documenti/CM2/splrand2')
 
+import numpy as np
+import matplotlib.pyplot as plt
+from scipy.optimize import curve_fit
+if sys.flags.interactive:
+	plt.ion()
+# try running with -i flag to see the consequences
 
-class testPdf(unittest.TestCase)
+from splrand2.pdf import ProbabilityDensityFunction
 
-	def test_triangular():
+class testPdf(unittest.TestCase):
+
+	def test_triangular(self):
 		"""test triangular distribution"""
 		x = np.linspace(0., 1., 100)
 		y = 2. * x
 
-		start_time = time.time()
 		pdf = ProbabilityDensityFunction(x, y)
-		print("elapsed time: {}".format(time.time() - start_time))
 
-		plt.figure('pdf')
+		plt.figure('pdf triangular')
 		plt.plot(x, pdf(x))
 		plt.xlabel('x')
 		plt.ylabel('pdf(x)')
 
-		plt.figure('cdf')
+		plt.figure('cdf triangular')
 		plt.plot(x, pdf.cdf(x))
 		plt.xlabel('x')
 		plt.ylabel('cdf(x)')
 
-		plt.figure('ppf')
+		plt.figure('ppf triangular')
 		# make sure that the domain of the ppf is the interval [0,1]
 		# (we can't just simply take the x array cause it exceed in the
 		# most general case)
@@ -31,18 +39,16 @@ class testPdf(unittest.TestCase)
 		plt.xlabel('q')
 		plt.ylabel('ppf(q)')
 
-		plt.figure('Sampling')
+		plt.figure('Sampling triangular')
 		rnd = pdf.rnd(1000000)
 		plt.hist(rnd, bins=200)
-
-		plt.show()
 
 		# pdf inherits the __call__ method from the spline class. From the
 		# scipy manuals: "evaluate spline at position x"
 		a = np.array([0.2, 0.6])
 		print(pdf(a))
 
-	def test_gauss(mu=0., sigma=1., support=10., num_points=500,
+	def test_gauss(self, mu=0., sigma=1., support=10., num_points=500,
 				   rnd_sample = 100000):
 		"""Unit test with a gaussian distribution"""
 		from scipy.stats import norm
@@ -50,17 +56,17 @@ class testPdf(unittest.TestCase)
 		y = norm.pdf(x, mu, sigma)
 		pdf = ProbabilityDensityFunction(x,y)
 
-		plt.figure('pdf')
+		plt.figure('pdf gaussian')
 		plt.plot(x, pdf(x))
 		plt.xlabel('x')
 		plt.ylabel('pdf(x)')
 
-		plt.figure('cdf')
+		plt.figure('cdf gaussian')
 		plt.plot(x, pdf.cdf(x))
 		plt.xlabel('x')
 		plt.ylabel('cdf(x)')
 
-		plt.figure('ppf')
+		plt.figure('ppf gaussian')
 		# make sure that the domain of the ppf is the interval [0,1]
 		# (we can't just simply take the x array cause it exceed in the
 		# most general case)
@@ -69,7 +75,7 @@ class testPdf(unittest.TestCase)
 		plt.xlabel('q')
 		plt.ylabel('ppf(q)')
 
-		plt.figure('Sampling')
+		plt.figure('Sampling gaussian')
 		# Here's what rnd function does: it generates some random values
 		# in the [0,1] interval. For every point, the ppf is evaluated.
 		# What we get is a set of point whose histogram should be similar
@@ -104,6 +110,4 @@ class testPdf(unittest.TestCase)
 		# multinomial distribution
 
 if __name__ == '__main__':
-	test_gauss()
-	plt.show()
-
+	unittest.main(exit=not sys.flags.interactive)
